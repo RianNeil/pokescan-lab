@@ -31,3 +31,6 @@ test-images/
 
 # Downloaded Pokémon card artwork and locally generated index (keep out of GitHub)
 data/reference_library/
+
+# Locally processed previews and card crops
+data/preprocessed/

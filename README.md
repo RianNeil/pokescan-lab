@@ -31,6 +31,31 @@ The script uses the ten selected TCGdex card IDs in `data/starter_cards.json`, d
 
 Downloaded card artwork and its generated local index are ignored by Git. They are for the project’s local experiments; the image source is recorded in the index, and the artwork should not be redistributed without permission.
 
+## Clean up card pictures (TOW-25)
+
+OpenCV is the picture-cleanup tool. It is not a custom AI model. On the Pi, set up the project environment once. `--system-site-packages` lets the environment use camera packages installed by Raspberry Pi OS:
+
+```bash
+cd ~/pokescan-lab
+python3 -m venv --system-site-packages .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+To make a cleaned-up copy of the Pi camera photo without changing the original:
+
+```bash
+python scripts/preprocess_card_images.py test-images/test-card.jpg
+```
+
+To make cleaned-up copies of all saved TCGdex reference pictures:
+
+```bash
+python scripts/preprocess_card_images.py data/reference_library/images --reference-images
+```
+
+The cleaned pictures and side-by-side previews are saved in `data/preprocessed/`, which stays local and is not pushed to GitHub. For a camera photo, the script tries to find the card edges and straighten the card. If it cannot find the edges, it keeps the photo, prints a warning, and creates a preview so we can inspect it.
+
 ## Run the starter on a Mac
 
 Use Python 3.11 or newer. These steps make a private project environment, install the pinned Python packages, and start a small local status API. The API is just a setup check; it does not use a camera or scan cards.
