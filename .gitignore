@@ -28,3 +28,6 @@ dist/
 
 # Local camera test photos (keep out of GitHub)
 test-images/
+
+# Downloaded Pokémon card artwork and locally generated index (keep out of GitHub)
+data/reference_library/

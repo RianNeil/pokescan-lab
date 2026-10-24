@@ -1,0 +1,16 @@
+{
+  "source": "Notion Starter Card Reference List (TOW-19)",
+  "source_url": "https://app.notion.com/p/403d2365218281e9ad6ec3b3d77a3c52",
+  "cards": [
+    {"id": "base3-50", "name": "Kabuto", "set": "Fossil", "number": "50/62", "language": "en"},
+    {"id": "30th-144", "name": "Meowth", "set": "30th Celebration", "number": "144/128", "language": "en"},
+    {"id": "30th-141", "name": "Galarian Meowth", "set": "30th Celebration", "number": "141/128", "language": "en"},
+    {"id": "xy7-13", "name": "Flareon (reverse foil)", "set": "Ancient Origins", "number": "13/98", "language": "en", "note": "The physical card is reverse foil; the TCGdex record does not distinguish the foil finish."},
+    {"id": "sm4-70", "name": "Kartana-GX", "set": "Crimson Invasion", "number": "70/111", "language": "en"},
+    {"id": "base3-40", "name": "Omastar", "set": "Fossil", "number": "40/62", "language": "en"},
+    {"id": "me04-104", "name": "Mega Dragalge ex", "set": "Chaos Rising", "number": "104/086", "language": "en"},
+    {"id": "swsh7-205", "name": "Leafeon VMAX", "set": "Evolving Skies", "number": "205/203", "language": "en"},
+    {"id": "xy5-117", "name": "Bidoof", "set": "Primal Clash", "number": "117/160", "language": "en"},
+    {"id": "30th-145", "name": "Hisuian Zorua", "set": "30th Celebration", "number": "145/128", "language": "en"}
+  ]
+}
