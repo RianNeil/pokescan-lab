@@ -1,0 +1,1 @@
+"""PokéScan Lab Python application."""
