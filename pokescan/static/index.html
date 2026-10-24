@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PokéScan Lab — Take a picture</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, sans-serif;
+        background: #f5f7fb;
+        color: #172033;
+      }
+
+      body {
+        margin: 0;
+        padding: 1.5rem;
+      }
+
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin-bottom: 0.5rem;
+      }
+
+      .instructions {
+        font-size: 1.1rem;
+        line-height: 1.5;
+      }
+
+      button {
+        min-height: 64px;
+        padding: 0.8rem 1.5rem;
+        border: 0;
+        border-radius: 12px;
+        background: #2457d6;
+        color: white;
+        font: inherit;
+        font-size: 1.35rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        background: #667085;
+        cursor: wait;
+      }
+
+      #status {
+        min-height: 1.6em;
+        margin: 1rem 0;
+        font-weight: 600;
+      }
+
+      .photos {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      figure {
+        margin: 0;
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 2px 10px #17203318;
+      }
+
+      figure img {
+        display: block;
+        width: 100%;
+        max-height: 65vh;
+        object-fit: contain;
+        background: #202633;
+      }
+
+      figcaption {
+        padding-top: 0.5rem;
+        font-weight: 600;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Take a card picture</h1>
+      <p class="instructions">Place one card in front of the camera, then press the button.</p>
+      <button id="take-picture" type="button">Take picture</button>
+      <p id="status" role="status" aria-live="polite">Ready when you are.</p>
+
+      <section id="photos" hidden aria-label="Saved pictures">
+        <h2>Your pictures</h2>
+        <div class="photos">
+          <figure>
+            <img id="original-photo" alt="Original photo from the Pi camera">
+            <figcaption>Original photo</figcaption>
+          </figure>
+          <figure>
+            <img id="cleaned-photo" alt="Cleaned-up card photo">
+            <figcaption>Cleaned-up photo</figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const button = document.querySelector("#take-picture");
+      const status = document.querySelector("#status");
+      const photos = document.querySelector("#photos");
+      const originalPhoto = document.querySelector("#original-photo");
+      const cleanedPhoto = document.querySelector("#cleaned-photo");
+
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        photos.hidden = true;
+        status.textContent = "Taking the picture and cleaning a copy…";
+
+        try {
+          const response = await fetch("/api/capture", { method: "POST" });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.detail || "The picture could not be taken. Try again.");
+          }
+
+          const newPicture = `?time=${Date.now()}`;
+          originalPhoto.src = result.original_url + newPicture;
+          cleanedPhoto.src = result.cleaned_url + newPicture;
+          photos.hidden = false;
+          status.textContent = result.message;
+        } catch (error) {
+          status.textContent = error.message || "The picture could not be taken. Check the camera and try again.";
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

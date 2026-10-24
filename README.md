@@ -56,9 +56,23 @@ python scripts/preprocess_card_images.py data/reference_library/images --referen
 
 The cleaned pictures and side-by-side previews are saved in `data/preprocessed/`, which stays local and is not pushed to GitHub. For a camera photo, the script tries to find the card edges and straighten the card. If it cannot find the edges, it keeps the photo, prints a warning, and creates a preview so we can inspect it.
 
+## Take a card picture on the Pi (TOW-49)
+
+Start PokéScan Lab on the Pi:
+
+```bash
+cd ~/pokescan-lab
+source .venv/bin/activate
+python -m pokescan
+```
+
+Leave that Terminal window open. In the Pi's web browser, open <http://127.0.0.1:8000>. Put a card in front of the camera and click **Take picture**. The page shows both the camera photo and the cleaned-up copy. Click the button again to replace them with a new picture. To stop the app, go back to Terminal and press Control-C.
+
+The original stays in `test-images/test-card.jpg`; the cleaned copy stays in `data/preprocessed/test-card-cleaned.jpg`. Both folders are ignored by Git, so the photos stay on the Pi.
+
 ## Run the starter on a Mac
 
-Use Python 3.11 or newer. These steps make a private project environment, install the pinned Python packages, and start a small local status API. The API is just a setup check; it does not use a camera or scan cards.
+Use Python 3.11 or newer. These steps make a private project environment, install the pinned Python packages, and start the local app. The Mac can show the page, but camera capture needs to run on the Pi.
 
 ```sh
 python3 --version
@@ -71,7 +85,7 @@ python -m pokescan
 
 When it starts, open <http://127.0.0.1:8000/health> in a browser. You should see a short JSON message saying the starter is running. Press Control-C in the terminal to stop it. To use the project another time, open a terminal in this folder, run `source .venv/bin/activate`, then run `python -m pokescan`.
 
-The Mac status API is only a setup check. It does not use the camera or scan cards. The Pi camera was tested separately by running `scripts/capture_test.py` on the Pi.
+On a Mac, the local app is only a setup check; it cannot use the Pi camera. The Pi camera was tested separately by running `scripts/capture_test.py` on the Pi.
 
 ## Project in one sentence
 
