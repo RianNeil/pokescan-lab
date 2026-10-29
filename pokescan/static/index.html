@@ -3,167 +3,1336 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PokéScan Lab — Take a picture</title>
+    <meta name="theme-color" content="#e63849">
+    <title>PokéScan Lab — Card scanner</title>
     <style>
       :root {
         color-scheme: light;
-        font-family: system-ui, sans-serif;
-        background: #f5f7fb;
-        color: #172033;
+        font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+        color: #172542;
+        background: #f4f7fc;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --navy: #20283e;
+        --muted: #4e5a72;
+        --line: #c3cede;
+        --paper: #fff;
+        --blue: #168ec9;
+        --teal: #138d9e;
+        --coral: #e63849;
+        --gold: #ffd844;
+        --mint: #dcf6ff;
+        --shadow: 0 6px 0 #aeb9cc, 0 17px 35px #1d315022;
       }
+
+      * { box-sizing: border-box; }
 
       body {
+        min-width: 320px;
+        min-height: 100vh;
         margin: 0;
-        padding: 1.5rem;
+        background:
+          radial-gradient(ellipse at 5% 0%, #e5f5f3 0, transparent 34rem),
+          radial-gradient(ellipse at 100% 15%, #e9edff 0, transparent 36rem),
+          #f4f7fc;
       }
 
-      main {
-        max-width: 900px;
+      button { font: inherit; }
+
+      .shell {
+        width: min(1320px, calc(100% - 56px));
         margin: 0 auto;
+        padding: 24px 0 32px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        min-height: 58px;
+        margin-bottom: 34px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--navy);
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: block;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 auto;
+      }
+
+      .brand-name {
+        display: block;
+        font-size: 1.05rem;
+        font-weight: 850;
+        letter-spacing: -.035em;
+      }
+
+      .brand-caption {
+        display: block;
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: .69rem;
+        font-weight: 750;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      .device-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 14px;
+        border: 1px solid #d8e3e7;
+        border-radius: 999px;
+        background: #ffffffb8;
+        color: #315866;
+        font-size: .78rem;
+        font-weight: 780;
+        letter-spacing: .025em;
+      }
+
+      .device-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #39b987;
+        box-shadow: 0 0 0 4px #39b98720;
+      }
+
+      .hero {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 23px;
+      }
+
+      .eyebrow {
+        margin: 0 0 9px;
+        color: var(--teal);
+        font-size: .72rem;
+        font-weight: 850;
+        letter-spacing: .14em;
+        text-transform: uppercase;
       }
 
       h1 {
-        margin-bottom: 0.5rem;
+        margin: 0;
+        color: var(--navy);
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        font-weight: 850;
+        letter-spacing: -.055em;
+        line-height: 1.04;
       }
 
-      .instructions {
-        font-size: 1.1rem;
+      .hero-copy {
+        margin: 11px 0 0;
+        color: var(--muted);
+        font-size: 1rem;
         line-height: 1.5;
       }
 
-      button {
-        min-height: 64px;
-        padding: 0.8rem 1.5rem;
-        border: 0;
-        border-radius: 12px;
-        background: #2457d6;
-        color: white;
-        font: inherit;
-        font-size: 1.35rem;
-        font-weight: 700;
-        cursor: pointer;
+      .reference-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        flex: 0 0 auto;
+        padding: 11px 15px;
+        border: 1px solid #dce5f1;
+        border-radius: 14px;
+        background: #ffffffa8;
+        color: #3d4f6c;
+        font-size: .82rem;
+        font-weight: 750;
       }
 
-      button:disabled {
-        background: #667085;
-        cursor: wait;
-      }
+      .reference-chip svg { width: 19px; height: 19px; color: var(--blue); }
 
-      #status {
-        min-height: 1.6em;
-        margin: 1rem 0;
-        font-weight: 600;
-      }
-
-      .photos {
+      .workbench {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
+        grid-template-columns: minmax(0, 1.28fr) minmax(330px, .82fr);
+        align-items: stretch;
+        gap: 20px;
       }
 
-      #guesses {
-        padding-left: 1.5rem;
+      .panel {
+        min-width: 0;
+        padding: clamp(20px, 2.5vw, 30px);
+        border: 1px solid #e7ebf3;
+        border-radius: 24px;
+        background: var(--paper);
+        box-shadow: var(--shadow);
       }
 
-      #guesses li {
-        margin: 0.45rem 0;
+      .panel-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 17px;
       }
 
-      figure {
+      .panel-heading h2 {
         margin: 0;
-        padding: 0.75rem;
-        border-radius: 12px;
-        background: white;
-        box-shadow: 0 2px 10px #17203318;
+        color: var(--navy);
+        font-size: 1.08rem;
+        font-weight: 820;
+        letter-spacing: -.025em;
       }
 
-      figure img {
+      .panel-kicker {
+        color: #7b879b;
+        font-size: .69rem;
+        font-weight: 800;
+        letter-spacing: .11em;
+        text-transform: uppercase;
+      }
+
+      .capture-card {
+        position: relative;
+        overflow: hidden;
+        padding: 21px;
+        border: 1px solid #dce9e9;
+        border-radius: 19px;
+        background: linear-gradient(118deg, #eff9f7 0%, #f4f8ff 100%);
+      }
+
+      .capture-card::after {
+        position: absolute;
+        top: -48px;
+        right: -35px;
+        width: 168px;
+        height: 168px;
+        border: 1px solid #b8d7d447;
+        border-radius: 50%;
+        content: "";
+        box-shadow: 0 0 0 17px #b8d7d41c, 0 0 0 34px #b8d7d414;
+        pointer-events: none;
+      }
+
+      .capture-row {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 22px;
+      }
+
+      .ready-copy { display: flex; align-items: flex-start; gap: 13px; min-width: 0; }
+
+      .ready-icon {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 13px;
+        background: #d9f1ea;
+        color: #18796f;
+      }
+
+      .ready-icon svg { width: 23px; height: 23px; }
+
+      .ready-copy h3 {
+        margin: 1px 0 4px;
+        color: #1a3e48;
+        font-size: 1rem;
+        font-weight: 820;
+      }
+
+      .ready-copy p {
+        max-width: 350px;
+        margin: 0;
+        color: #55717a;
+        font-size: .83rem;
+        line-height: 1.45;
+      }
+
+      .take-picture {
+        display: inline-flex;
+        min-height: 58px;
+        align-items: center;
+        justify-content: center;
+        gap: 11px;
+        flex: 0 0 auto;
+        padding: 0 23px;
+        border: 0;
+        border-radius: 16px;
+        background: var(--coral);
+        box-shadow: 0 7px 0 #d95543, 0 12px 22px #e9695335;
+        color: white;
+        cursor: pointer;
+        font-size: 1.05rem;
+        font-weight: 850;
+        transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      }
+
+      .take-picture:hover { transform: translateY(-2px); box-shadow: 0 9px 0 #d95543, 0 15px 24px #e969533b; }
+      .take-picture:active { transform: translateY(3px); box-shadow: 0 3px 0 #d95543, 0 7px 12px #e969532b; }
+      .take-picture:focus-visible, a:focus-visible { outline: 4px solid #3566e86b; outline-offset: 4px; }
+      .take-picture:disabled { cursor: wait; filter: saturate(.7); }
+      .take-picture svg { width: 22px; height: 22px; }
+
+      .local-note {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin: 16px 0 0 55px;
+        color: #547579;
+        font-size: .73rem;
+        font-weight: 670;
+      }
+
+      .local-note svg { width: 15px; height: 15px; color: var(--teal); }
+
+      .photos-heading { margin-top: 27px; }
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      figure { min-width: 0; margin: 0; }
+
+      .photo-frame {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 1.42;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        background: #e9eef5;
+      }
+
+      .photo-frame svg { display: block; width: 100%; height: 100%; }
+
+      .photo-frame img {
         display: block;
         width: 100%;
-        max-height: 65vh;
+        height: 100%;
         object-fit: contain;
-        background: #202633;
+        background: #20283e;
+      }
+
+      .photo-placeholder {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        gap: 8px;
+        padding: 16px;
+        color: #46536c;
+        text-align: center;
+      }
+
+      .photo-placeholder svg { width: 36px; height: 36px; justify-self: center; color: #168ec9; }
+      .photo-placeholder strong { font-size: .8rem; }
+      .photo-placeholder span { font-size: .68rem; line-height: 1.4; }
+
+      .photo-stamp {
+        position: absolute;
+        right: 9px;
+        bottom: 9px;
+        padding: 5px 8px;
+        border: 1px solid #ffffff80;
+        border-radius: 7px;
+        background: #172542b8;
+        color: white;
+        font-size: .57rem;
+        font-weight: 850;
+        letter-spacing: .1em;
       }
 
       figcaption {
-        padding-top: 0.5rem;
-        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 9px 1px 0;
+        color: #34425c;
+        font-size: .8rem;
+        font-weight: 780;
       }
 
-      [hidden] {
-        display: none !important;
+      figcaption span:last-child { color: #8590a2; font-size: .69rem; font-weight: 650; }
+
+      .photo-footnote {
+        margin: 12px 0 0;
+        color: #7b8799;
+        font-size: .7rem;
+        line-height: 1.4;
+      }
+
+      .matches-panel { display: flex; flex-direction: column; }
+
+      .match-title-wrap { min-width: 0; }
+
+      .match-title-wrap .panel-heading { margin-bottom: 5px; }
+
+      .match-subtitle {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: .82rem;
+        line-height: 1.45;
+      }
+
+      .top-match {
+        position: relative;
+        overflow: hidden;
+        padding: 17px 17px 15px;
+        border: 1px solid #dbe7ff;
+        border-radius: 17px;
+        background: linear-gradient(135deg, #f1f5ff 0%, #f7f9ff 100%);
+      }
+
+      .top-match::before {
+        position: absolute;
+        top: -29px;
+        right: -18px;
+        width: 95px;
+        height: 95px;
+        border: 1px solid #b8c9f551;
+        border-radius: 50%;
+        content: "";
+        box-shadow: 0 0 0 11px #b8c9f51e, 0 0 0 22px #b8c9f512;
+      }
+
+      .top-match-label {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+        color: #4964a5;
+        font-size: .64rem;
+        font-weight: 850;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      .best-pill {
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: #dce8ff;
+        color: #3154a6;
+        font-size: .61rem;
+        letter-spacing: .04em;
+      }
+
+      .card-identity {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+
+      .creature-token {
+        display: grid;
+        width: 55px;
+        height: 55px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 1px solid #d6ddff;
+        border-radius: 16px;
+        background: white;
+      }
+
+      .creature-token svg { width: 43px; height: 43px; }
+
+      .card-identity h3 {
+        margin: 0 0 5px;
+        color: var(--navy);
+        font-size: 1.19rem;
+        font-weight: 850;
+        letter-spacing: -.03em;
+      }
+
+      .card-identity p { margin: 0; color: #687692; font-size: .76rem; font-weight: 630; }
+
+      .score-row {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .score-track { height: 7px; flex: 1; overflow: hidden; border-radius: 99px; background: #dce4f4; }
+      .score-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6386ed, #25aaa3); }
+      .score-number { min-width: 34px; color: #425a9a; font-size: .8rem; font-weight: 850; text-align: right; }
+      .score-caption { margin: 6px 0 0; color: #77839a; font-size: .66rem; }
+
+      .other-guesses { display: grid; gap: 9px; margin-top: 11px; }
+
+      .match-empty {
+        margin: 0;
+        padding: 18px;
+        border: 1.5px dashed #8592a8;
+        border-radius: 12px;
+        color: #53617a;
+        font-size: .8rem;
+        line-height: 1.45;
+      }
+
+      .guess-row {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 12px;
+        border: 1px solid #e8ebf2;
+        border-radius: 13px;
+        background: #fff;
+      }
+
+      .guess-number {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 11px;
+        background: #f2f5fa;
+        color: #61708c;
+        font-size: .72rem;
+        font-weight: 850;
+      }
+
+      .guess-main { min-width: 0; }
+      .guess-main strong { display: block; overflow: hidden; color: #263550; font-size: .81rem; font-weight: 820; text-overflow: ellipsis; white-space: nowrap; }
+      .guess-main span { display: block; overflow: hidden; margin-top: 3px; color: #7a879c; font-size: .68rem; text-overflow: ellipsis; white-space: nowrap; }
+      .guess-score { color: #687590; font-size: .75rem; font-weight: 820; }
+
+      .match-reminder {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        margin: 15px 0 0;
+        padding: 11px 12px;
+        border-radius: 12px;
+        background: #fff8e8;
+        color: #765c25;
+        font-size: .71rem;
+        line-height: 1.45;
+      }
+
+      .match-reminder svg { width: 17px; height: 17px; flex: 0 0 auto; color: #b88523; }
+
+      .scan-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: auto;
+        padding-top: 18px;
+        color: #7a879a;
+        font-size: .69rem;
+      }
+
+      .time-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 9px;
+        border-radius: 9px;
+        background: #f1f5fa;
+        color: #53637d;
+        font-weight: 760;
+      }
+
+      .time-chip svg { width: 14px; height: 14px; }
+
+      .error-card {
+        display: none;
+        margin-top: 14px;
+        padding: 14px 15px;
+        border: 1px solid #f2ccc5;
+        border-radius: 14px;
+        background: #fff4f1;
+        color: #773d34;
+      }
+
+      .error-card.is-visible { display: flex; gap: 11px; }
+      .error-card svg { width: 20px; height: 20px; flex: 0 0 auto; color: #c55343; }
+      .error-card strong { display: block; margin-bottom: 3px; color: #71392f; font-size: .81rem; }
+      .error-card p { margin: 0; font-size: .74rem; line-height: 1.45; }
+
+      .bottomline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 16px auto 0;
+        color: #8792a5;
+        font-size: .68rem;
+        font-weight: 650;
+      }
+
+      .bottomline svg { width: 14px; height: 14px; color: #7489b1; }
+
+      .demo-tag {
+        position: fixed;
+        right: 15px;
+        bottom: 13px;
+        z-index: 5;
+        padding: 7px 10px;
+        border: 1px solid #d9e0eb;
+        border-radius: 9px;
+        background: #ffffffed;
+        box-shadow: 0 3px 12px #17254214;
+        color: #66738a;
+        font-size: .62rem;
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      .is-busy .ready-icon { background: #fff0cf; color: #9a6b11; }
+      .is-busy .ready-icon svg { animation: turn 1.2s linear infinite; }
+      .is-busy .ready-copy h3 { color: #6e5015; }
+      .is-busy .ready-copy p { color: #80692f; }
+      .has-error .ready-icon { background: #ffe3de; color: #ab493b; }
+      .has-error .ready-copy h3 { color: #813f36; }
+      .has-error .ready-copy p { color: #805c56; }
+      .has-error .device-dot { background: #dc6757; box-shadow: 0 0 0 4px #dc675720; }
+
+      /* Original PokéScan colors with a bold, handheld-game feel. */
+      body {
+        background:
+          radial-gradient(ellipse at 0% 0%, #ffd9dc 0, transparent 33rem),
+          radial-gradient(ellipse at 100% 14%, #ccefff 0, transparent 35rem),
+          #edf1f8;
+      }
+
+      .topbar {
+        padding: 8px 15px;
+        border: 3px solid #20283e;
+        border-radius: 19px 19px 13px 13px;
+        background: linear-gradient(112deg, #ee3b4b, #c91f3d);
+        box-shadow: 0 5px 0 #8d273d, 0 11px 22px #8d273d25;
+      }
+
+      .brand, .brand-name, .brand-caption { color: white; }
+      .brand-caption { opacity: .84; }
+
+      .device-status {
+        border: 2px solid #20283e;
+        border-radius: 10px;
+        background: #fffdf6;
+        color: #27314a;
+        box-shadow: 0 2px 0 #8d273d;
+      }
+
+      .eyebrow { color: #c42a43; }
+      .reference-chip {
+        border: 2px solid #263149;
+        border-radius: 11px;
+        background: #fff;
+        box-shadow: 0 3px 0 #aeb9cc;
+        color: #263149;
+      }
+
+      .panel {
+        border: 2px solid #28334c;
+        border-radius: 19px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel-kicker { color: #236f9c; }
+
+      .capture-card {
+        border: 2px solid #28334c;
+        border-radius: 14px;
+        background: linear-gradient(118deg, #e1f8ff 0%, #f3fcff 100%);
+      }
+
+      .capture-card::after { border-color: #4bb1d147; box-shadow: 0 0 0 17px #4bb1d11c, 0 0 0 34px #4bb1d114; }
+      .ready-icon { border: 2px solid #28334c; border-radius: 11px; background: #e63849; color: #ffdf50; }
+      .ready-copy h3 { color: #20283e; }
+      .ready-copy p { color: #3b5572; }
+
+      .take-picture {
+        border: 2px solid #20283e;
+        border-radius: 12px;
+        background: #e63849;
+        box-shadow: 0 5px 0 #8d273d, 0 10px 18px #ae25363a;
+      }
+
+      .take-picture:hover { box-shadow: 0 7px 0 #8d273d, 0 13px 22px #ae25363a; }
+      .take-picture:active { box-shadow: 0 2px 0 #8d273d, 0 5px 10px #ae25362b; }
+      .take-picture:focus-visible, a:focus-visible { outline-color: #168ec98c; }
+      .local-note { color: #334761; }
+      .local-note svg { color: #168ec9; }
+
+      .photo-frame { border: 2px solid #28334c; border-radius: 12px; background: #bfeafa; }
+      .photo-stamp { border: 2px solid #ffd844; border-radius: 6px; background: #20283e; }
+      figcaption { color: #263149; }
+      figcaption span:last-child, .photo-footnote { color: #596781; }
+
+      .top-match {
+        border: 2px solid #28334c;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #e4f8ff, #f5fcff);
+        box-shadow: inset 0 0 0 4px #d2f1fc;
+      }
+
+      .top-match::before { border-color: #45a9cd51; box-shadow: 0 0 0 11px #45a9cd1e, 0 0 0 22px #45a9cd12; }
+      .top-match-label { color: #175d8a; }
+      .best-pill { border: 1px solid #28334c; border-radius: 6px; background: #ffd844; color: #352d1d; }
+      .creature-token { border: 2px solid #28334c; border-radius: 12px; background: #fffdf6; }
+      .card-identity p { color: #4f5e77; }
+      .score-track { border: 1px solid #28334c; background: #cceefa; }
+      .score-fill { background: linear-gradient(90deg, #168ec9, #22b6c0); }
+      .score-number { color: #175d8a; }
+      .score-caption { color: #53647e; }
+
+      .guess-row { border: 1.5px solid #53617a; border-radius: 10px; box-shadow: 0 2px 0 #e1e6ef; }
+      .guess-number { border: 1px solid #28334c; border-radius: 8px; background: #28334c; color: #ffd844; }
+      .guess-main strong { color: #20283e; }
+      .guess-main span, .guess-score { color: #53617a; }
+
+      .match-reminder { border: 1.5px solid #9e7b2a; border-radius: 10px; background: #fff3bd; color: #514221; }
+      .match-reminder svg { color: #c43b45; }
+      .time-chip { border: 1.5px solid #28334c; border-radius: 8px; background: #fff; color: #27314a; }
+      .error-card { border: 2px solid #bd3646; border-radius: 11px; background: #fff0ed; color: #713640; }
+      .error-card svg, .error-card strong { color: #a82c40; }
+      .error-card p { color: #713f48; }
+      .bottomline { color: #46536c; }
+      .bottomline svg { color: #168ec9; }
+      .demo-tag { border: 2px solid #20283e; border-radius: 8px; background: #ffd844; box-shadow: 0 3px 0 #a98727; color: #283149; }
+
+      .is-busy .ready-icon { background: #ffd844; color: #283149; }
+      .is-busy .ready-copy h3 { color: #513e17; }
+      .is-busy .ready-copy p { color: #5f542f; }
+      .has-error .ready-icon { background: #fff0ed; color: #a82c40; }
+      .has-error .ready-copy h3 { color: #813f36; }
+      .has-error .ready-copy p { color: #805c56; }
+      .has-error .device-dot { background: #ffd844; box-shadow: 0 0 0 4px #ffd84442; }
+
+      /* Shape the page like an original open handheld scanner. */
+      .shell {
+        position: relative;
+        width: min(1400px, calc(100% - 44px));
+        margin: 18px auto 24px;
+        padding: 16px clamp(15px, 2.7vw, 34px) 20px;
+        border: 4px solid #20283e;
+        border-radius: 34px 34px 27px 27px;
+        background: linear-gradient(142deg, #f04a54 0%, #df3047 54%, #c51f3e 100%);
+        box-shadow: 0 8px 0 #86253a, 0 24px 42px #27365124;
+      }
+
+      .topbar {
+        min-height: 58px;
+        margin-bottom: 22px;
+        padding: 3px 3px 13px;
+        border: 0;
+        border-bottom: 2px solid #a51e3a;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .device-right { display: flex; align-items: center; gap: 14px; }
+      .hardware-cluster { display: flex; align-items: center; gap: 8px; }
+      .hardware-lens {
+        position: relative;
+        display: block;
+        width: 47px;
+        height: 47px;
+        border: 4px solid #20283e;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 31%, #bff6ff 0 9%, #39b9df 11% 38%, #1678aa 41% 62%, #20283e 66% 100%);
+        box-shadow: inset 0 0 0 2px #ffffffa8, 0 2px 0 #9d263b;
+      }
+
+      .hardware-lens::after {
+        position: absolute;
+        top: 7px;
+        left: 8px;
+        width: 9px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+        content: "";
+        opacity: .9;
+        transform: rotate(-32deg);
+      }
+
+      .hardware-lights { display: flex; gap: 5px; padding: 5px; }
+      .hardware-lights span { width: 9px; height: 9px; border: 1px solid #20283e; border-radius: 50%; box-shadow: 0 1px 0 #9d263b; }
+      .hardware-lights span:nth-child(1) { background: #ffd844; }
+      .hardware-lights span:nth-child(2) { background: #60d19d; }
+      .hardware-lights span:nth-child(3) { background: #36bde8; }
+      .hardware-keypad { display: grid; grid-template-columns: repeat(2, 8px); gap: 3px; padding: 4px; border: 2px solid #20283e; border-radius: 7px; background: #bd1d3b; box-shadow: 0 2px 0 #9d263b; }
+      .hardware-keypad span { width: 8px; height: 7px; border: 1px solid #16527b; border-radius: 2px; background: linear-gradient(#74dfff, #238fc5); }
+      .hardware-enter { width: 20px; height: 20px; border: 2px solid #20283e; border-radius: 50%; background: #ffd844; box-shadow: 0 2px 0 #9d263b; }
+      .device-status { padding: 8px 11px; }
+
+      .hero { margin-bottom: 18px; }
+      .eyebrow { color: #fff0a8; }
+      h1 { color: #fff; text-shadow: 0 2px 0 #9d263b; }
+      .hero-copy { color: #fff4f0; }
+      .reference-chip { border-radius: 10px; }
+
+      .workbench {
+        gap: 13px;
+        padding: 10px;
+        border: 4px solid #20283e;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #252e47, #141c32);
+        box-shadow: inset 0 0 0 3px #56627a, 0 4px 0 #97283c;
+      }
+
+      .panel { padding: clamp(17px, 2.2vw, 28px); border-radius: 15px; box-shadow: 0 3px 0 #c1cada; }
+      .device-status .status-copy { color: #27314a; }
+      .bottomline { color: #fff3e9; }
+      .bottomline svg { color: #ffdf50; }
+
+      @media (max-width: 900px) {
+        .shell { width: min(780px, calc(100% - 30px)); padding-inline: 15px; }
+        .device-right { gap: 8px; }
+        .workbench { padding: 8px; }
+      }
+
+      @media (max-width: 560px) {
+        .shell { width: calc(100% - 16px); margin-top: 8px; padding: 11px 9px 16px; border-width: 3px; border-radius: 24px 24px 19px 19px; }
+        .topbar { gap: 8px; margin-bottom: 15px; padding-bottom: 9px; }
+        .hardware-lens { width: 34px; height: 34px; border-width: 3px; }
+        .hardware-lights { display: none; }
+        .device-right { gap: 6px; }
+        .hardware-keypad, .hardware-enter, .hardware-lights { display: none; }
+        .device-status { padding: 6px 7px; font-size: .6rem; }
+        .device-status .status-copy { display: none; }
+        .workbench { padding: 6px; border-width: 3px; border-radius: 16px; }
+        .panel { padding: 13px; border-radius: 12px; }
+      }
+
+      [hidden] { display: none !important; }
+
+      @keyframes turn { to { transform: rotate(360deg); } }
+
+      @media (max-width: 900px) {
+        .shell { width: min(760px, calc(100% - 36px)); padding-top: 18px; }
+        .topbar { margin-bottom: 26px; }
+        .workbench { grid-template-columns: 1fr; }
+        .matches-panel { min-height: 0; }
+        .scan-meta { margin-top: 17px; }
+      }
+
+      @media (max-width: 560px) {
+        .shell { width: calc(100% - 24px); padding-top: 12px; }
+        .topbar { min-height: 48px; margin-bottom: 24px; }
+        .brand-mark { width: 42px; height: 42px; }
+        .brand-name { font-size: .94rem; }
+        .brand-caption { font-size: .59rem; }
+        .device-status { gap: 7px; padding: 8px 10px; font-size: .65rem; }
+        .hero { display: block; margin-bottom: 17px; }
+        h1 { font-size: 2.25rem; }
+        .hero-copy { font-size: .88rem; }
+        .reference-chip { margin-top: 14px; }
+        .workbench { gap: 13px; }
+        .panel { padding: 17px; border-radius: 19px; }
+        .capture-row { display: grid; gap: 18px; }
+        .take-picture { width: 100%; }
+        .local-note { margin-left: 0; }
+        .photo-grid { gap: 9px; }
+        .photo-frame { aspect-ratio: 1.12; }
+        figcaption { display: block; font-size: .74rem; }
+        figcaption span:last-child { display: block; margin-top: 3px; }
+        .demo-tag { right: 8px; bottom: 8px; font-size: .55rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>Take a card picture</h1>
-      <p class="instructions">Place one card in front of the camera, then press the button.</p>
-      <button id="take-picture" type="button">Take picture</button>
-      <p id="status" role="status" aria-live="polite">Ready when you are.</p>
+    <div class="shell" id="scanner">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="PokéScan Lab home">
+          <svg class="brand-mark" viewBox="0 0 48 48" role="img" aria-label="Original PokéScan Lab lens symbol">
+            <defs>
+              <linearGradient id="logo-bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f04a52" />
+                <stop offset="1" stop-color="#bf1e3d" />
+              </linearGradient>
+            </defs>
+            <rect x="1" y="1" width="46" height="46" rx="16" fill="url(#logo-bg)" />
+            <path d="M15 19.5a9 9 0 0 1 18 0c0 4.2-2.9 7.2-7 7.2-3.2 0-5.4-2.1-5.4-4.9a4.4 4.4 0 0 1 4.4-4.4" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="3" />
+            <path d="M12 14.5a14 14 0 0 1 24 9.8c-.2 6.4-4.4 10.9-10.2 10.9" fill="none" stroke="#bcefff" stroke-linecap="round" stroke-width="2" />
+            <circle cx="32.8" cy="13.5" r="2.5" fill="#ffdf50" />
+            <path d="M13.7 31.7h5m-2.5-2.5v5" stroke="#ffdf50" stroke-linecap="round" stroke-width="1.8" />
+          </svg>
+          <span>
+            <span class="brand-name">PokéScan Lab</span>
+            <span class="brand-caption">Card scanner</span>
+          </span>
+        </a>
+        <div class="device-right">
+          <div class="hardware-cluster" aria-hidden="true">
+            <span class="hardware-lens"></span>
+            <span class="hardware-keypad"><span></span><span></span><span></span><span></span></span>
+            <span class="hardware-enter"></span>
+            <span class="hardware-lights"><span></span><span></span><span></span></span>
+          </div>
+          <div class="device-status" id="device-status"><span class="device-dot"></span><span class="status-copy">Local scanner page</span></div>
+        </div>
+      </header>
 
-      <section id="photos" hidden aria-label="Saved pictures">
-        <h2>Your pictures</h2>
-        <div class="photos">
-          <figure>
-            <img id="original-photo" alt="Original photo from the Pi camera">
-            <figcaption>Original photo</figcaption>
-          </figure>
-          <figure>
-            <img id="cleaned-photo" alt="Cleaned-up card photo">
-            <figcaption>Cleaned-up photo</figcaption>
-          </figure>
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Your card discovery station</p>
+          <h1 id="page-title">Let’s find your card.</h1>
+          <p class="hero-copy">Place one card in view. PokéScan will compare it with the saved cards on this Pi.</p>
+        </div>
+        <div class="reference-chip" aria-label="Local saved card library">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 4.5h9.5A2.5 2.5 0 0 1 19 7v12.5H8.5A2.5 2.5 0 0 1 6 17V5.5A1 1 0 0 1 7 4.5Z" stroke="currentColor" stroke-width="1.8" />
+            <path d="M6 7H5.5A1.5 1.5 0 0 0 4 8.5v9A2 2 0 0 0 6 19.5h12M9 9h6m-6 3h6" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+          </svg>
+          Local card library
         </div>
       </section>
 
-      <section id="matches" hidden aria-label="Possible card matches">
-        <h2>Closest saved cards</h2>
-        <p id="match-note">These are guesses, so check the card before saving it.</p>
-        <ol id="guesses"></ol>
-        <p id="match-time"></p>
-      </section>
-    </main>
+      <main class="workbench">
+        <section class="panel capture-panel" aria-labelledby="capture-title">
+          <div class="panel-heading">
+            <h2 id="capture-title">Your scan</h2>
+            <span class="panel-kicker">Step 1 · Take a picture</span>
+          </div>
+
+          <div class="capture-card" id="capture-card">
+            <div class="capture-row">
+              <div class="ready-copy" aria-live="polite">
+                <span class="ready-icon" id="ready-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3.5v2m0 13v2m8.5-8.5h-2m-13 0h-2m14.01-6.01-1.42 1.42M7.91 16.09l-1.42 1.42m11.02 0-1.42-1.42M7.91 7.91 6.49 6.49" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+                    <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8" />
+                    <circle cx="12" cy="12" r="1.2" fill="currentColor" />
+                  </svg>
+                </span>
+                <span>
+                  <h3 id="status-title">Ready when you are</h3>
+                  <p id="status-message">Hold one card steady in the camera frame, then tap the button.</p>
+                </span>
+              </div>
+              <button class="take-picture" id="take-picture" type="button">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h2l1.2-1.7h4.6L15.5 6h2A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8" />
+                  <circle cx="12" cy="12.5" r="3.4" stroke="currentColor" stroke-width="1.8" />
+                </svg>
+                <span>Take picture</span>
+              </button>
+            </div>
+            <p class="local-note">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3.5 5 6.3v5.2c0 4.3 2.8 7.5 7 9 4.2-1.5 7-4.7 7-9V6.3l-7-2.8Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8" />
+                <path d="m9 12 2 2 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+              </svg>
+              Your pictures stay saved on this Pi.
+            </p>
+          </div>
+
+          <div class="panel-heading photos-heading">
+            <h2>Photo previews</h2>
+            <span class="panel-kicker">Step 2 · Check the card</span>
+          </div>
+
+          <div class="photo-grid">
+            <figure>
+              <div class="photo-frame">
+                <svg viewBox="0 0 520 360" role="img" aria-label="Example original camera photo of a sample card on a tabletop">
+                  <defs>
+                    <linearGradient id="table" x1="0" y1="0" x2="1" y2="1">
+                      <stop stop-color="#79d8ee" />
+                      <stop offset="1" stop-color="#64aee7" />
+                    </linearGradient>
+                    <linearGradient id="card" x1="0" y1="0" x2="0.8" y2="1">
+                      <stop stop-color="#fffef8" />
+                      <stop offset="1" stop-color="#e8f8ff" />
+                    </linearGradient>
+                    <filter id="card-shadow" x="-30%" y="-30%" width="160%" height="170%">
+                      <feDropShadow dx="0" dy="12" stdDeviation="11" flood-color="#273958" flood-opacity=".28" />
+                    </filter>
+                  </defs>
+                  <rect width="520" height="360" fill="url(#table)" />
+                  <path d="M0 278c104-27 189 35 288 1 75-26 142-36 232-8v89H0Z" fill="#ffd159" opacity=".7" />
+                  <circle cx="76" cy="61" r="40" fill="#ffffff" opacity=".15" />
+                  <circle cx="448" cy="78" r="64" fill="#fff" opacity=".11" />
+                  <g transform="translate(258 179) rotate(-8) skewY(2)" filter="url(#card-shadow)">
+                    <rect x="-92" y="-142" width="184" height="284" rx="14" fill="url(#card)" stroke="#fff" stroke-width="5" />
+                    <rect x="-77" y="-126" width="154" height="33" rx="7" fill="#dff7ff" />
+                    <circle cx="-61" cy="-109" r="7" fill="#e63849" />
+                    <path d="M-45-112h95M-45-104h63" stroke="#64758d" stroke-linecap="round" stroke-width="4" opacity=".65" />
+                    <rect x="-75" y="-83" width="150" height="146" rx="9" fill="#d9f3ff" />
+                    <path d="M-75 40 2-48l72 96v15H-75Z" fill="#37b6c0" />
+                    <path d="m-40 33 45-55 72 87H-40Z" fill="#ffd159" />
+                    <path d="M-14 7c-24-12-23-38-5-48 5-20 36-24 50-5 20 5 25 29 12 42-4 27-39 31-57 11Z" fill="#e63849" />
+                    <circle cx="4" cy="-27" r="3.5" fill="#25334f" />
+                    <circle cx="26" cy="-27" r="3.5" fill="#25334f" />
+                    <path d="M7-13q9 7 18 0" fill="none" stroke="#25334f" stroke-linecap="round" stroke-width="3" />
+                    <path d="M-59 83h113M-59 94h75M-59 116h75" stroke="#74819a" stroke-linecap="round" stroke-width="4" opacity=".6" />
+                    <circle cx="58" cy="115" r="9" fill="#ffd844" />
+                  </g>
+                  <path d="m58 274 5 11 12 1-9 8 3 12-11-7-10 7 3-12-9-8 12-1Z" fill="#fff4c8" opacity=".8" />
+                </svg>
+                <span class="photo-stamp">SAMPLE IMAGE</span>
+              </div>
+              <figcaption><span>Original photo</span><span>Before cleanup</span></figcaption>
+            </figure>
+
+            <figure>
+              <div class="photo-frame">
+                <svg viewBox="0 0 520 360" role="img" aria-label="Example cleaned and straightened sample card preview">
+                  <defs>
+                    <linearGradient id="clean-bg" x1="0" y1="0" x2="1" y2="1">
+                      <stop stop-color="#e7f8ff" />
+                      <stop offset="1" stop-color="#cdeefa" />
+                    </linearGradient>
+                    <linearGradient id="clean-card" x1="0" y1="0" x2="1" y2="1">
+                      <stop stop-color="#fffef8" />
+                      <stop offset="1" stop-color="#e4f7ff" />
+                    </linearGradient>
+                    <filter id="clean-shadow" x="-25%" y="-20%" width="150%" height="150%">
+                      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#33415d" flood-opacity=".16" />
+                    </filter>
+                  </defs>
+                  <rect width="520" height="360" fill="url(#clean-bg)" />
+                  <circle cx="260" cy="180" r="139" fill="#fff" opacity=".48" />
+                  <g transform="translate(260 180)" filter="url(#clean-shadow)">
+                    <rect x="-86" y="-140" width="172" height="280" rx="14" fill="url(#clean-card)" stroke="#fff" stroke-width="5" />
+                    <rect x="-72" y="-125" width="144" height="31" rx="7" fill="#d9f7ff" />
+                    <circle cx="-57" cy="-109" r="6" fill="#e63849" />
+                    <path d="M-43-112h88M-43-104h56" stroke="#64758d" stroke-linecap="round" stroke-width="4" opacity=".65" />
+                    <rect x="-70" y="-83" width="140" height="146" rx="8" fill="#d9f3ff" />
+                    <path d="M-70 41-2-37l72 87v13H-70Z" fill="#37b6c0" />
+                    <path d="m-38 38 44-55 64 80v0H-38Z" fill="#ffd159" />
+                    <path d="M-12 4c-23-12-20-35-4-46 6-19 34-22 47-4 19 6 22 27 10 40-5 25-35 29-53 10Z" fill="#e63849" />
+                    <circle cx="4" cy="-28" r="3.3" fill="#25334f" />
+                    <circle cx="25" cy="-28" r="3.3" fill="#25334f" />
+                    <path d="M7-14q8 6 17 0" fill="none" stroke="#25334f" stroke-linecap="round" stroke-width="3" />
+                    <path d="M-55 82h110M-55 94h71M-55 116h71" stroke="#74819a" stroke-linecap="round" stroke-width="4" opacity=".6" />
+                    <circle cx="57" cy="115" r="8" fill="#ffd844" />
+                  </g>
+                  <path d="m408 91 4 9 10 1-8 7 2 10-8-5-9 5 3-10-8-7 10-1Z" fill="#52aaa2" opacity=".72" />
+                  <circle cx="110" cy="252" r="6" fill="#f1b95f" />
+                  <circle cx="404" cy="270" r="4" fill="#e63849" />
+                </svg>
+                <span class="photo-stamp">SAMPLE IMAGE</span>
+              </div>
+              <figcaption><span>Cleaned-up photo</span><span>Straightened card</span></figcaption>
+            </figure>
+          </div>
+          <p class="photo-footnote">The Pi saves the original picture and a cleaned copy for matching.</p>
+        </section>
+
+        <section class="panel matches-panel" aria-labelledby="matches-title">
+          <div class="match-title-wrap">
+            <div class="panel-heading">
+              <h2 id="matches-title">Possible matches</h2>
+              <span class="panel-kicker">Step 3 · Compare</span>
+            </div>
+            <p class="match-subtitle">Take a picture to see the saved cards that look most like yours.</p>
+          </div>
+
+          <p class="match-empty" id="match-empty">Your closest card guesses will appear here after a picture.</p>
+
+          <article class="top-match" id="top-match" aria-label="Closest card guess" hidden>
+            <div class="top-match-label"><span>Closest look</span><span class="best-pill">#1 guess</span></div>
+            <div class="card-identity">
+              <span class="creature-token" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none">
+                  <path d="M11 27c-4-4-1-11 5-12 3-7 13-8 18-2 7 1 9 9 4 14-1 8-11 12-19 8-5 1-9-2-8-8Z" fill="#e63849" />
+                  <path d="m15 16-4-7m21 7 5-6" stroke="#ef987c" stroke-linecap="round" stroke-width="3" />
+                  <circle cx="20" cy="24" r="2" fill="#25334f" /><circle cx="30" cy="24" r="2" fill="#25334f" />
+                  <path d="M22 31q3 2 6 0" stroke="#25334f" stroke-linecap="round" stroke-width="2" />
+                  <path d="M7 40h34" stroke="#29aeba" stroke-linecap="round" stroke-width="3" />
+                </svg>
+              </span>
+              <span>
+                <h3 id="top-name"></h3>
+                <p id="top-details"></p>
+              </span>
+            </div>
+            <div class="score-row" id="top-score-row" aria-label="Similarity score">
+              <div class="score-track"><div class="score-fill" id="top-score-fill" style="width:0%"></div></div>
+              <span class="score-number" id="top-score"></span>
+            </div>
+            <p class="score-caption">Similarity score · higher means a closer-looking picture</p>
+          </article>
+
+          <div class="other-guesses" id="other-guesses" aria-label="Other close guesses" hidden></div>
+
+          <p class="match-reminder" id="match-reminder" hidden>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 3.5 21 20H3L12 3.5Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.8" />
+              <path d="M12 9v5m0 3h.01" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+            </svg>
+            <span><strong>These are guesses.</strong> Check the card yourself—the score is a clue, not a promise.</span>
+          </p>
+
+          <div class="error-card" id="error-card" role="alert" aria-live="assertive">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+              <path d="M12 7.5v5m0 3.5h.01" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+            </svg>
+            <span><strong id="error-title">The camera needs a hand.</strong><p id="error-message">I couldn't find the camera. Check that it's connected to the Pi, then try again.</p></span>
+          </div>
+
+          <div class="scan-meta">
+            <span id="scan-meta-label">Match time will appear after a picture</span>
+            <span class="time-chip">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8" /><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
+              <span id="scan-time">—</span>
+            </span>
+          </div>
+        </section>
+      </main>
+
+      <p class="bottomline">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5 5 6.3v5.2c0 4.3 2.8 7.5 7 9 4.2-1.5 7-4.7 7-9V6.3l-7-2.8Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.7" /><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" /></svg>
+        A small, local-first scanner made for curious card collectors
+      </p>
+    </div>
 
     <script>
+      const scanner = document.querySelector("#scanner");
       const button = document.querySelector("#take-picture");
-      const status = document.querySelector("#status");
-      const photos = document.querySelector("#photos");
-      const originalPhoto = document.querySelector("#original-photo");
-      const cleanedPhoto = document.querySelector("#cleaned-photo");
-      const matches = document.querySelector("#matches");
-      const guesses = document.querySelector("#guesses");
-      const matchTime = document.querySelector("#match-time");
+      const buttonLabel = button.querySelector("span");
+      const statusTitle = document.querySelector("#status-title");
+      const statusMessage = document.querySelector("#status-message");
+      const errorCard = document.querySelector("#error-card");
+      const errorTitle = document.querySelector("#error-title");
+      const errorMessage = document.querySelector("#error-message");
+      const matchReminder = document.querySelector("#match-reminder");
+      const photoGrid = document.querySelector(".photo-grid");
+      const photoFootnote = document.querySelector(".photo-footnote");
+      const topMatch = document.querySelector("#top-match");
+      const otherGuesses = document.querySelector("#other-guesses");
+      const matchEmpty = document.querySelector("#match-empty");
+      const matchesTitle = document.querySelector("#matches-title");
+      const matchesSubtitle = document.querySelector(".match-subtitle");
+      const scanMetaLabel = document.querySelector("#scan-meta-label");
+      const scanTime = document.querySelector("#scan-time");
+      const photoViews = [...document.querySelectorAll(".photo-frame")].map((frame, index) => {
+        frame.querySelector("svg").hidden = true;
+        const stamp = frame.querySelector(".photo-stamp");
+        stamp.hidden = true;
+
+        const image = document.createElement("img");
+        image.alt = index === 0 ? "Original photo taken by the Pi camera" : "Cleaned-up card photo used for matching";
+        image.hidden = true;
+
+        const placeholder = document.createElement("div");
+        placeholder.className = "photo-placeholder";
+        placeholder.textContent = index === 0
+          ? "The Pi camera photo will show up here."
+          : "The cleaned-up copy will show up here.";
+
+        frame.append(image, placeholder);
+        image.addEventListener("error", () => {
+          image.hidden = true;
+          placeholder.hidden = false;
+          placeholder.textContent = "This picture could not be opened. Try taking it again.";
+          stamp.hidden = true;
+        });
+
+        return { image, placeholder, stamp };
+      });
+
+      function hideOldResult() {
+        for (const photo of photoViews) {
+          photo.image.hidden = true;
+          photo.placeholder.hidden = false;
+          photo.stamp.hidden = true;
+        }
+        topMatch.hidden = true;
+        otherGuesses.replaceChildren();
+        otherGuesses.hidden = true;
+        matchReminder.hidden = true;
+        matchEmpty.hidden = false;
+        matchEmpty.textContent = "Your closest card guesses will appear here after a picture.";
+        matchesTitle.textContent = "Possible matches";
+        matchesSubtitle.textContent = "Take a picture to see the saved cards that look most like yours.";
+        scanMetaLabel.textContent = "Match time will appear after a picture";
+        scanTime.textContent = "—";
+      }
+
+      function showPhotos(originalUrl, cleanedUrl) {
+        const cacheTag = `scan=${Date.now()}`;
+        [originalUrl, cleanedUrl].forEach((url, index) => {
+          const photo = photoViews[index];
+          photo.image.src = `${url}${url.includes("?") ? "&" : "?"}${cacheTag}`;
+          photo.image.hidden = false;
+          photo.placeholder.hidden = true;
+          photo.stamp.textContent = index === 0 ? "ORIGINAL" : "CLEANED COPY";
+          photo.stamp.hidden = false;
+        });
+      }
+
+      function cardDetails(guess) {
+        const parts = [guess.set, guess.number ? `Card ${guess.number}` : null].filter(Boolean);
+        return parts.join(" · ") || "Saved reference card";
+      }
+
+      function scoreText(value) {
+        const score = Number(value);
+        return Number.isFinite(score) ? score.toFixed(2) : "—";
+      }
+
+      function renderGuesses(guesses) {
+        otherGuesses.replaceChildren();
+        const [best, ...others] = guesses;
+        if (!best) {
+          topMatch.hidden = true;
+          otherGuesses.hidden = true;
+          matchEmpty.hidden = false;
+          matchEmpty.textContent = "No card guesses came back. Check that the saved card pictures are ready on the Pi.";
+          matchReminder.hidden = true;
+          return;
+        }
+
+        document.querySelector("#top-name").textContent = best.name || "Unknown card";
+        document.querySelector("#top-details").textContent = cardDetails(best);
+        const bestScore = Number(best.score);
+        const scorePercent = Number.isFinite(bestScore) ? Math.max(0, Math.min(100, bestScore * 100)) : 0;
+        document.querySelector("#top-score-fill").style.width = `${scorePercent}%`;
+        document.querySelector("#top-score").textContent = scoreText(best.score);
+        document.querySelector("#top-score-row").setAttribute("aria-label", `Similarity score ${scoreText(best.score)}`);
+        topMatch.setAttribute("aria-label", `Closest card guess: ${best.name || "Unknown card"}`);
+        topMatch.hidden = false;
+
+        others.slice(0, 2).forEach((guess, index) => {
+          const row = document.createElement("div");
+          row.className = "guess-row";
+
+          const number = document.createElement("span");
+          number.className = "guess-number";
+          number.textContent = String(index + 2).padStart(2, "0");
+
+          const identity = document.createElement("span");
+          identity.className = "guess-main";
+          const name = document.createElement("strong");
+          name.textContent = guess.name || "Unknown card";
+          const details = document.createElement("span");
+          details.textContent = cardDetails(guess);
+          identity.append(name, details);
+
+          const score = document.createElement("span");
+          score.className = "guess-score";
+          score.textContent = scoreText(guess.score);
+          row.append(number, identity, score);
+          otherGuesses.append(row);
+        });
+
+        otherGuesses.hidden = others.length === 0;
+        matchEmpty.hidden = true;
+        matchReminder.hidden = false;
+      }
+
+      function showError(title, message, { savedPhoto = false } = {}) {
+        scanner.classList.add("has-error");
+        errorTitle.textContent = title;
+        errorMessage.textContent = message;
+        errorCard.classList.add("is-visible");
+        matchReminder.hidden = true;
+        topMatch.hidden = true;
+        otherGuesses.hidden = true;
+        matchEmpty.hidden = false;
+        matchEmpty.textContent = savedPhoto
+          ? "The picture is safe, but no card guesses are ready yet."
+          : "Take a picture after fixing the scanner to see card guesses.";
+        matchesTitle.textContent = savedPhoto ? "Picture saved · no guesses yet" : "Scanner needs a hand";
+        matchesSubtitle.textContent = savedPhoto
+          ? "Check the saved card pictures on the Pi, then try matching again."
+          : "The scan did not finish, so there are no card guesses yet.";
+        scanMetaLabel.textContent = "No match time yet";
+        scanTime.textContent = "—";
+        if (!savedPhoto) {
+          for (const photo of photoViews) {
+            photo.image.hidden = true;
+            photo.placeholder.hidden = false;
+            photo.stamp.hidden = true;
+          }
+        }
+      }
 
       button.addEventListener("click", async () => {
+        scanner.classList.remove("has-error");
+        scanner.classList.add("is-busy");
+        errorCard.classList.remove("is-visible");
+        hideOldResult();
+        statusTitle.textContent = "Taking and cleaning your picture…";
+        statusMessage.textContent = "Hold the card still for a moment.";
         button.disabled = true;
-        photos.hidden = true;
-        matches.hidden = true;
-        status.textContent = "Taking the picture and cleaning a copy…";
+        buttonLabel.textContent = "Taking picture…";
 
         try {
+          // This page is served by the same Python app, so the Pi camera stays local.
           const response = await fetch("/api/capture", { method: "POST" });
-          const result = await response.json();
+          const result = await response.json().catch(() => ({}));
           if (!response.ok) {
-            throw new Error(result.detail || "The picture could not be taken. Try again.");
+            if ([404, 405, 501].includes(response.status)) {
+              throw new Error("not-scanner-page");
+            }
+            const detail = result.detail || "The scanner could not finish this picture.";
+            if (detail.toLowerCase().includes("picture saved, but card matching")) {
+              showPhotos("/photos/original", "/photos/cleaned");
+              throw new Error("matching");
+            }
+            if (detail.toLowerCase().includes("camera tools are not available")) {
+              throw new Error("camera-not-on-pi");
+            }
+            throw new Error("camera");
           }
 
-          const newPicture = `?time=${Date.now()}`;
-          originalPhoto.src = result.original_url + newPicture;
-          cleanedPhoto.src = result.cleaned_url + newPicture;
-          photos.hidden = false;
-          status.textContent = result.message;
-          guesses.replaceChildren();
-          for (const guess of result.matches.guesses) {
-            const item = document.createElement("li");
-            item.textContent = `${guess.name} — ${guess.set}, ${guess.number} (similarity ${guess.score})`;
-            guesses.append(item);
-          }
-          matchTime.textContent = `Comparing the photo took ${result.matches.matching_ms} ms on this device.`;
-          matches.hidden = false;
+          showPhotos(result.original_url, result.cleaned_url);
+          const guesses = Array.isArray(result.matches?.guesses) ? result.matches.guesses : [];
+          renderGuesses(guesses);
+          matchesTitle.textContent = guesses.length ? "Closest saved cards" : "No card guess yet";
+          matchesSubtitle.textContent = guesses.length
+            ? "Here are the saved pictures that look most like this card."
+            : "The photo is ready, but there are no card guesses to show.";
+          const time = Number(result.matches?.matching_ms);
+          scanMetaLabel.textContent = "Match time on this device";
+          scanTime.textContent = Number.isFinite(time) ? `${time} ms` : "—";
+          statusTitle.textContent = "Your picture is ready!";
+          statusMessage.textContent = result.message || "The Pi saved your picture and checked the card library.";
         } catch (error) {
-          status.textContent = error.message || "The picture could not be taken. Check the camera and try again.";
+          if (error.message === "matching") {
+            statusTitle.textContent = "Your photo is safe";
+            statusMessage.textContent = "I could not compare it with the saved card pictures yet.";
+            showError("Matching needs a hand.", "Check that the ten reference pictures are on the Pi. The first model download also needs internet.", { savedPhoto: true });
+          } else if (error.message === "camera-not-on-pi") {
+            statusTitle.textContent = "Open this page on the Pi";
+            statusMessage.textContent = "This Mac can show the screen, but the camera is connected to the Pi.";
+            showError("The camera is ready on the Pi.", "Run PokéScan on the Raspberry Pi, then open its scanner page in the Pi's browser.");
+          } else if (error.message === "not-scanner-page" || error instanceof TypeError) {
+            statusTitle.textContent = "Open the scanner app";
+            statusMessage.textContent = "This design preview is not connected to the camera.";
+            showError("This page is only a preview.", "On the Pi, open http://127.0.0.1:8000 after starting PokéScan. That page can reach the camera.");
+          } else {
+            statusTitle.textContent = "Camera not ready";
+            statusMessage.textContent = "Your photo was not taken. Check the camera, then try again.";
+            showError("The camera needs a hand.", "Check that the camera is connected to the Pi and try taking the picture again.");
+          }
         } finally {
+          scanner.classList.remove("is-busy");
           button.disabled = false;
+          buttonLabel.textContent = "Take picture";
         }
       });
     </script>

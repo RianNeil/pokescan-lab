@@ -56,9 +56,9 @@ python scripts/preprocess_card_images.py data/reference_library/images --referen
 
 The cleaned pictures and side-by-side previews are saved in `data/preprocessed/`, which stays local and is not pushed to GitHub. For a camera photo, the script tries to find the card edges and straighten the card. If it cannot find the edges, it keeps the photo, prints a warning, and creates a preview so we can inspect it.
 
-## Take a card picture on the Pi (TOW-49)
+## Use the PokéScan scanner on the Pi (TOW-27)
 
-Start PokéScan Lab on the Pi:
+Run the scanner on the Raspberry Pi, because the camera is connected to the Pi:
 
 ```bash
 cd ~/pokescan-lab
@@ -66,7 +66,9 @@ source .venv/bin/activate
 python -m pokescan
 ```
 
-Leave that Terminal window open. In the Pi's web browser, open <http://127.0.0.1:8000>. Put a card in front of the camera and click **Take picture**. The page shows both the camera photo and the cleaned-up copy. Click the button again to replace them with a new picture. To stop the app, go back to Terminal and press Control-C.
+Leave that Terminal window open. In the Pi's web browser, open <http://127.0.0.1:8000>. Put one card in front of the camera and click **Take picture**. The page shows the camera photo, the cleaned-up copy, and up to three card guesses with similarity scores. Click the button again to take another picture. To stop the app, go back to Terminal and press Control-C.
+
+The design preview at `design/tow-54-scanner-mockup.html` is only a drawing. The working screen is the matching PokéScan page served by the Python app at `http://127.0.0.1:8000/`. On a Mac, the screen can open, but the real camera button works only when the app is running on the Pi.
 
 The original stays in `test-images/test-card.jpg`; the cleaned copy stays in `data/preprocessed/test-card-cleaned.jpg`. Both folders are ignored by Git, so the photos stay on the Pi.
 
