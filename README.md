@@ -70,6 +70,32 @@ Leave that Terminal window open. In the Pi's web browser, open <http://127.0.0.1
 
 The original stays in `test-images/test-card.jpg`; the cleaned copy stays in `data/preprocessed/test-card-cleaned.jpg`. Both folders are ignored by Git, so the photos stay on the Pi.
 
+## First card-matching experiment (TOW-22)
+
+Card matching uses **MobileNetV2 1.0 int8**, a small pretrained image model from the [ONNX Model Zoo](https://github.com/onnx/models/blob/main/validated/vision/classification/mobilenet/README.md). The model is Apache 2.0 licensed. [ONNX Runtime's CPU package](https://onnxruntime.ai/docs/get-started/with-python.html) has a CPython 3.13 Linux ARM64 wheel, which fits this Pi's 64-bit OS and Python. We are not training a model. MobileNet was taught to recognize everyday ImageNet categories, not individual Pokémon cards. For this first experiment, its 1,000 output scores become a compact image fingerprint. We compare fingerprints with cosine similarity: a larger score means the model thinks two pictures are more alike. The score is a ranking clue, not a probability or a promise that the guess is right.
+
+The app makes cleaned copies of the ten references using `preprocess_card_image(..., detect_card=False)`. A scan uses the same existing cleanup with card-edge detection. Both are resized to 224 × 224 RGB, scaled to 0–1, and normalized with ImageNet's standard channel means and deviations. The model runs on `CPUExecutionProvider` with two inference threads. Its weights and saved reference fingerprints are kept in the ignored `data/reference_library/` folder. The model downloads the first time matching starts, so the Pi needs internet for that first run; later matches use the local files.
+
+After updating the Pi and installing `requirements.txt`, download the ten reference pictures if needed, then start the app as described above. The first capture may take longer while the model downloads and the ten fingerprints are made. Later captures show up to three card guesses, their cosine scores, and the photo-matching time. The saved fingerprint file includes the model name, settings, model checksum, and checksums for the reference pictures so it can be rebuilt when any of those change.
+
+To compare several sample photos with known cards, save the photos locally on the Pi, then run (repeat `--expected-id` in the same order as the photo paths):
+
+```bash
+python scripts/benchmark_matching.py test-images/sample-1.jpg test-images/sample-2.jpg \
+  --expected-id base3-50 --expected-id 30th-144 \
+  --output data/preprocessed/tow-22-pi-results.json
+```
+
+The report separates first-run setup time from each photo's matching time and lists the top three guesses. Example recordings:
+
+| Pi sample photo | Correct card ID | Top guess | Top-three result | Matching time |
+| --- | --- | --- | --- | --- |
+| Pending Pi run | — | — | — | Not measured yet |
+
+On the Mac, a sanity check compared three saved reference images against the ten-card list; each exact reference ranked itself first. It took 15.3–16.0 ms per image on that Mac. These controlled reference-image checks do not test camera photos, and the Mac time is not the Pi measurement.
+
+Record a few real Pi camera photos here after running the benchmark. The Mac implementation can be checked locally, but its speed does not count as the Pi result. Keep the photo files and report local; the reference artwork is also excluded from Git.
+
 ## Run the starter on a Mac
 
 Use Python 3.11 or newer. These steps make a private project environment, install the pinned Python packages, and start the local app. The Mac can show the page, but camera capture needs to run on the Pi.

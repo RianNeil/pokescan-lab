@@ -6,6 +6,7 @@ import cv2
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 
+from pokescan.card_matching import get_matcher
 from pokescan.image_preprocessing import preprocess_card_image, read_image
 
 app = FastAPI(title="PokéScan Lab", description="Local camera photo capture")
@@ -32,7 +33,7 @@ def health() -> dict[str, str]:
 
 
 @app.post("/api/capture")
-def capture_photo() -> dict[str, str | bool]:
+def capture_photo() -> dict[str, object]:
     """Take a photo, save a cleaned copy, and return their local page links."""
     try:
         from picamera2 import Picamera2
@@ -67,11 +68,20 @@ def capture_photo() -> dict[str, str | bool]:
     else:
         message = "Picture saved. I could not find the card edges, so the cleaned copy uses the full photo."
 
+    try:
+        matches = get_matcher().match_processed_image(result.image)
+    except Exception as error:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Picture saved, but card matching could not start. Check that the ten reference pictures are saved and the Pi has internet for its first model download. Details: {error}",
+        ) from error
+
     return {
         "message": message,
         "card_edge_found": result.card_edge_found,
         "original_url": "/photos/original",
         "cleaned_url": "/photos/cleaned",
+        "matches": matches,
     }
 
 

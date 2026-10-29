@@ -61,6 +61,14 @@
         gap: 1rem;
       }
 
+      #guesses {
+        padding-left: 1.5rem;
+      }
+
+      #guesses li {
+        margin: 0.45rem 0;
+      }
+
       figure {
         margin: 0;
         padding: 0.75rem;
@@ -107,6 +115,13 @@
           </figure>
         </div>
       </section>
+
+      <section id="matches" hidden aria-label="Possible card matches">
+        <h2>Closest saved cards</h2>
+        <p id="match-note">These are guesses, so check the card before saving it.</p>
+        <ol id="guesses"></ol>
+        <p id="match-time"></p>
+      </section>
     </main>
 
     <script>
@@ -115,10 +130,14 @@
       const photos = document.querySelector("#photos");
       const originalPhoto = document.querySelector("#original-photo");
       const cleanedPhoto = document.querySelector("#cleaned-photo");
+      const matches = document.querySelector("#matches");
+      const guesses = document.querySelector("#guesses");
+      const matchTime = document.querySelector("#match-time");
 
       button.addEventListener("click", async () => {
         button.disabled = true;
         photos.hidden = true;
+        matches.hidden = true;
         status.textContent = "Taking the picture and cleaning a copy…";
 
         try {
@@ -133,6 +152,14 @@
           cleanedPhoto.src = result.cleaned_url + newPicture;
           photos.hidden = false;
           status.textContent = result.message;
+          guesses.replaceChildren();
+          for (const guess of result.matches.guesses) {
+            const item = document.createElement("li");
+            item.textContent = `${guess.name} — ${guess.set}, ${guess.number} (similarity ${guess.score})`;
+            guesses.append(item);
+          }
+          matchTime.textContent = `Comparing the photo took ${result.matches.matching_ms} ms on this device.`;
+          matches.hidden = false;
         } catch (error) {
           status.textContent = error.message || "The picture could not be taken. Check the camera and try again.";
         } finally {
